@@ -1,7 +1,7 @@
 class APIError(Exception):
     statusCode = 500
 
-class Error404(APIError):
+class Error404(Exception):
     statusCode = 404
 
 
@@ -9,7 +9,7 @@ def errorHandler(fn):
     def wrapper(*args,**kwargs):
         try:
             return fn(*args,**kwargs)
-        except APIError as e:
+        except Exception as e:
             print(e)
             return {
                 "status":"error",
