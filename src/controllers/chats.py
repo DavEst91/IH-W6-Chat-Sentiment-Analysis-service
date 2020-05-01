@@ -31,7 +31,7 @@ def create_conversation():
 @app.route("/chat/<conversation_name>/adduser", methods=["GET","POST"])
 @errorHandler
 def add_user_to_conversation(conversation_name):
-    conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1})        
+    conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"messages":1})        
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
     username=request.args.get("username").lower()
@@ -41,3 +41,15 @@ def add_user_to_conversation(conversation_name):
     db["conversations"].update({"_id":conversation["_id"]},{"$addToSet":{"users":username}})
     db["users"].update({"_id":user["_id"]},{"$addToSet":{"conversations":[conversation["conversation_name"],conversation["_id"]]}})
     return {username:f"added to {conversation}"}
+
+
+@app.route("/chat/<conversation_name>/list", methods=["GET"])
+@errorHandler
+def list_messages_of_chat(conversation_name):
+    conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"users":1,"messages":1})        
+    if not conversation:
+        raise Error404("Conversation doesn't exist in database")
+    pointers=[db["messages"].find_one({"_id":object_id}) for object_id in conversation["messages"]]
+    text=([f"{{{sentence['user'][0]}:{sentence['message']}}}" for sentence in pointers])
+
+    return(dumps(text))

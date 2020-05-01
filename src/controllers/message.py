@@ -12,6 +12,7 @@ import pymongo
 @app.route("/chat/<conversation_name>/addmessage")
 #@errorHandler
 def add_message(conversation_name):
+
     conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"users":1})        
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
@@ -21,14 +22,16 @@ def add_message(conversation_name):
         raise Error404("User not found in database")
     if user["username"] not in conversation["users"]:
         raise APIError("User is not in this conversation.Please, add it first")
+
     message=request.args.get("message").replace("%20"," ")
     message_id=db["messages"].insert_one(
             {"message":message,
              "user":[username,user["_id"]],
              "conversation":[conversation["conversation_name"],conversation["_id"]]}).inserted_id
-    db["users"].update({"_id":user["_id"]},{"$addToSet":{"messages":message_id}})
+    db["users"].update({"_id":user["_id"]},{"$addToSet":{"mesagges":message_id}})
     db["conversations"].update({"_id":conversation["_id"]},{"$addToSet":{"messages":message_id}})
-    return ("oook")
+    print("hola")
+    return (f"{{'message_id':{message_id}}}")
 
 
 
