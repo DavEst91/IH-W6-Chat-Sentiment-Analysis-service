@@ -28,12 +28,6 @@ You have to create an api with all this endpoints:
   - **Purpose:** Recommend friend to this user based on chat contents
   - **Returns:** json array with top 3 similar users
 
-### 2. Chat endpoints
-
-
-- (GET) `/chat/<chat_id>/sentiment`
-  - **Purpose:** Analyze messages from `chat_id`. Use `NLTK` sentiment analysis package for this task
-  - **Returns:** json with all sentiments from messages in the chat
 
 ## Links - API dev in python
 

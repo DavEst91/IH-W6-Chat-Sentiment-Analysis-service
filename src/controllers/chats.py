@@ -25,7 +25,7 @@ def create_conversation():
         raise APIError("Wrong parameters. Try /user/create?conversation=<conversation_name>")
     try:
         db["conversations"].insert_one(
-            {"conversation_name":conversation_name,"users":[],"mesagges":[]}
+            {"conversation_name":conversation_name,"users":[],"messages":[]}
             )   
         return  {conversation_name:"created!"}
     except:
@@ -56,6 +56,8 @@ def list_messages_of_chat(conversation_name):
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
     pointers=[db["messages"].find_one({"_id":object_id}) for object_id in conversation["messages"]]
+    if not pointers:
+        raise APIError("Conversation is empty")
     list_of_messages=([{sentence['user'][0]:sentence['message']} for sentence in pointers])
     return(json.dumps(list_of_messages))
 

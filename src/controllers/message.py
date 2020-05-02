@@ -12,7 +12,6 @@ import pymongo
 @app.route("/chat/<conversation_name>/addmessage")
 #@errorHandler
 def add_message(conversation_name):
-
     conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"users":1})        
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
