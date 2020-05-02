@@ -28,7 +28,7 @@ def add_message(conversation_name):
             {"message":message,
              "user":[username,user["_id"]],
              "conversation":[conversation["conversation_name"],conversation["_id"]]}).inserted_id
-    db["users"].update({"_id":user["_id"]},{"$addToSet":{"mesagges":message_id}})
+    db["users"].update({"_id":user["_id"]},{"$addToSet":{"messages":message_id}})
     db["conversations"].update({"_id":conversation["_id"]},{"$addToSet":{"messages":message_id}})
     print("hola")
     return (f"{{'message_id':{message_id}}}")
