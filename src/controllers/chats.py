@@ -5,8 +5,14 @@ from src.controllers.load_database import db
 from bson.json_util import dumps
 from flask import request
 from src.helpers.errorHandler import errorHandler, Error404,APIError
-
+import json
 import pymongo
+import nltk
+import pandas as pd
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import requests
+nltk.download("vader_lexicon")
+
 
 db.conversations.create_index([("conversation_name", pymongo.ASCENDING)], unique=True)
 
@@ -50,6 +56,22 @@ def list_messages_of_chat(conversation_name):
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
     pointers=[db["messages"].find_one({"_id":object_id}) for object_id in conversation["messages"]]
-    text=([f"{{{sentence['user'][0]}:{sentence['message']}}}" for sentence in pointers])
+    list_of_messages=([{sentence['user'][0]:sentence['message']} for sentence in pointers])
+    return(json.dumps(list_of_messages))
 
-    return(dumps(text))
+
+
+@app.route("/chat/<conversation_name>/sentiment", methods=["GET"])
+@errorHandler
+def value_conversation(conversation_name):
+    conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"messages":1})        
+    if not conversation:
+        raise Error404("Conversation doesn't exist in database")
+    sia = SentimentIntensityAnalyzer()
+    valorations=pd.DataFrame(columns=["neg","neu","pos","compound"])
+    sentences=requests.get(f"http://127.0.0.1:4000/chat/{conversation_name}/list").json()
+    for sentence in sentences:
+        scores=sia.polarity_scores(list(sentence.values())[0])
+        scores_df=pd.DataFrame(data=[scores.values()],columns=["neg","neu","pos","compound"])
+        valorations=pd.concat([valorations,scores_df])
+    return(valorations.mean().to_json())

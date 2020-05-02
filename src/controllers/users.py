@@ -25,9 +25,12 @@ def get_user_info(username):
 def add_user():
     try:
         username=request.args.get("username").lower()
-        useremail=request.args.get("useremail")
     except:
         raise APIError("Wrong parameters. Try /user/create?username=<username>")
+    #This step is neccesary because mongo method insert_one does not manage correctly uniquenness of the username
+    user = db['users'].find_one({"username":username},{"_id":1, "username":1,"conversations":1,"messages":1})
+    if user!=None:
+        raise APIError("This user already exists in database")
     try:
         db["users"].insert_one(
             {"username":username,
