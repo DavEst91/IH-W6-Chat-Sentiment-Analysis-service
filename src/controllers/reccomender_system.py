@@ -17,10 +17,11 @@ nltk.download("vader_lexicon")
 #This is the function to calculate score of a single user
 def value_user(user):
     messages_id=db["users"].find_one({"username":user},{"messages":1})
-    messages=[db.messages.find_one({"_id":ident},{"message":1})["message"] for ident in messages_id["messages"]]
+    messages_pointer=db.messages.find({"_id":{ "$in": messages_id["messages"]}},{"message":1})
+    messages=[sentence["message"] for sentence in messages_pointer]
     sia = SentimentIntensityAnalyzer()
     valorations=pd.DataFrame(columns=["neg","neu","pos","compound"])
-    for sentence in messages:
+    for sentence in list(messages):
         scores=sia.polarity_scores(sentence)
         scores_df=pd.DataFrame(data=[scores.values()],columns=["neg","neu","pos","compound"])
         valorations=pd.concat([valorations,scores_df])

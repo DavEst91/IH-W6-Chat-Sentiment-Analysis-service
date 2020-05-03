@@ -55,11 +55,13 @@ def list_messages_of_chat(conversation_name):
     conversation= db['conversations'].find_one({"conversation_name":conversation_name},{"_id":1, "conversation_name":1,"users":1,"messages":1})        
     if not conversation:
         raise Error404("Conversation doesn't exist in database")
-    pointers=[db["messages"].find_one({"_id":object_id}) for object_id in conversation["messages"]]
+    pointers=db["messages"].find({"_id":{"$in" :conversation["messages"]}})
     if not pointers:
         raise APIError("Conversation is empty")
     list_of_messages=([{sentence['user'][0]:sentence['message']} for sentence in pointers])
     return(json.dumps(list_of_messages))
+   
+
 
 
 
@@ -71,7 +73,7 @@ def value_conversation(conversation_name):
         raise Error404("Conversation doesn't exist in database")
     sia = SentimentIntensityAnalyzer()
     valorations=pd.DataFrame(columns=["neg","neu","pos","compound"])
-    sentences=requests.get(f"http://127.0.0.1:4000/chat/{conversation_name}/list").json()
+    sentences=json.loads(list_messages_of_chat(conversation_name))
     for sentence in sentences:
         scores=sia.polarity_scores(list(sentence.values())[0])
         scores_df=pd.DataFrame(data=[scores.values()],columns=["neg","neu","pos","compound"])
