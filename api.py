@@ -1,8 +1,8 @@
-from src.config import PORT
+from src.config import PORT,IP
 from src.app import app
 import src.controllers.users
 import src.controllers.chats
 import src.controllers.message
 import src.controllers.reccomender_system
 
-app.run("127.0.0.1", PORT, debug=True)
+app.run(IP, PORT, debug=True)

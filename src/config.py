@@ -4,3 +4,4 @@ dotenv.load_dotenv()
 
 PORT = os.getenv("PORT")
 DBURL = os.getenv("DBURL")
+IP=os.getenv("IP")
