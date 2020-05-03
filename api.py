@@ -5,4 +5,4 @@ import src.controllers.chats
 import src.controllers.message
 import src.controllers.reccomender_system
 
-app.run(IP, PORT, debug=True)
+app.run(debug=True)
