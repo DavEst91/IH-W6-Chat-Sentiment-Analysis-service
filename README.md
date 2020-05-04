@@ -36,4 +36,4 @@ The next endpoints are provided:
 * Analyse sentiments from a chat
 ```/chat/<chat_id>/sentiment```
 
-The app is actually deployed in (https://davestchat.herokuapp.com/)[https://davestchat.herokuapp.com/]
+The app is actually deployed in https://davestchat.herokuapp.com/
